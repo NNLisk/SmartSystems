@@ -3,7 +3,8 @@
 
 
 ## Overview
-+ A good morning bot that uses telegrams API to send messages every morning
++ Smart morning assistant
++ Purpose is to help students start their morning more efficiently
 + news, weather, schedule
 + tuudo university menu
 + the of the day section
