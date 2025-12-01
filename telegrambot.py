@@ -3,7 +3,7 @@ from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardR
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import aiohttp
 
-BOT_TOKEN = "8395339833:AAHQQ42FFOg62jHZz1BCq7Gwght8Q8Or7Ms"
+BOT_TOKEN = "token"
 user_locations = {}
 waiting_for_city = set()  
 
