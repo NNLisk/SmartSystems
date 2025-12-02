@@ -2,12 +2,20 @@ from dotenv import load_dotenv, dotenv_values
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import weather
+import userbase
 
 BOT_TOKEN = "token"
+
 waiting_for_city = set()  
 
 # START THE BOT
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    user_name = update.effective_user.username
+
+    userbase.add_user(user_id, user_name)
+    ## User location can also be saved here?
+
     await update.message.reply_text(
         "GOOOOOOOOD MOOOORNINNGG VIETNAAMMM\n\n"
         "I can help you with weather forecasts! Just mention 'weather' in your message."
@@ -61,6 +69,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif 'news' in text_lower:
         await update.message.reply_text("lorem ipsum some news to be developed")
+
+
+def build_morning_message(user_id):
+    pass
+
 
 def main():
     config = dotenv_values(".env")
