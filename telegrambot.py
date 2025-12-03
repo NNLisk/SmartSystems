@@ -4,7 +4,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 import weather, lunch
 import userbase
 
-BOT_TOKEN = "8395339833:AAHQQ42FFOg62jHZz1BCq7Gwght8Q8Or7Ms"
+BOT_TOKEN = "token"
 
 waiting_for_city = set()  
 
