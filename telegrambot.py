@@ -19,7 +19,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "GOOOOOOOOD MOOOORNINNGG VIETNAAMMM\n\n"
         "I can help you with weather forecasts! Just mention 'weather' in your message."
+
+        "please, accept the use of your location"
     )
+
+    await weather.show_location_button(update)
+
+    location = update.message.location
+    lat = location.latitude
+    long = location.longitude
+
+    userbase.save_user_location(user_id, lat, long)
+
 
 
 # BASIC MESSAGE LISTENING AND RESPONSES
@@ -69,7 +80,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # First time - show location button
             await weather.show_location_button(update)
     
-    elif 'news' in text_lower:
+    if 'news' in text_lower:
         await update.message.reply_text("lorem ipsum some news to be developed")
 
     if "morning" in text_lower:
