@@ -1,14 +1,14 @@
 import aiohttp
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import userbase
 
-user_locations = {}
+#user_locations = {} not needed anymore
 
 
 # SHOW LOCATION BUTTON
 async def show_location_button(update: Update):
     location_button = KeyboardButton(text="📍 Allow access my location", request_location=True)
-    #manual_button = KeyboardButton(text="✍️ Type City Name")
     keyboard = ReplyKeyboardMarkup(
         [[location_button]], 
         one_time_keyboard=True, 
@@ -18,7 +18,7 @@ async def show_location_button(update: Update):
     await update.message.reply_text(
         "📍 Please allow access your location to get weather information:\n\n"
         "• Tap 'Allow access my location' (mobile)\n"
-        "• Or enter your /city",
+        "• Or tap on /city to enter your city" ,
         reply_markup=keyboard
     )
 
@@ -28,12 +28,8 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     location = update.message.location
     user_id = update.effective_user.id
     
-    user_locations[user_id] = {
-        'latitude': location.latitude,
-        'longitude': location.longitude
-    }
+    userbase.save_user_location(user_id, location.latitude, location.longitude)
     
-    # Immediately fetch and show weather
     weather_data = await get_weather(location.latitude, location.longitude)
     weather_message = format_weather_message(weather_data)
     await update.message.reply_text(weather_message, reply_markup=ReplyKeyboardRemove())
@@ -61,7 +57,6 @@ async def get_coordinates(city_name: str) -> dict:
 
 # GET WEATHER DATA
 async def get_weather(lat: float, lon: float) -> dict:
-    """Fetch weather data from Open-Meteo API (free, no API key needed)"""
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         'latitude': lat,
@@ -83,14 +78,11 @@ async def get_weather(lat: float, lon: float) -> dict:
 
 # FORMAT WEATHER MESSAGE
 def format_weather_message(weather_data: dict) -> str:
-    """Format weather data into a readable message"""
     if not weather_data:
         return "Could not fetch weather data. Please try again."
     
     current = weather_data.get('current', {})
     daily = weather_data.get('daily', {})
-    
-    # Weather code interpretation 
     weather_codes = {
         0: "☀️ Clear sky",
         1: "🌤️ Mainly clear",
@@ -121,7 +113,6 @@ def format_weather_message(weather_data: dict) -> str:
             f"🌡️ Min: {min_temp}°C | Max: {max_temp}°C 💧 {precipitation} mm"
         )
     else:
-        # fallback to current temp if daily not available
         message = (
             f"WEATHER TODAY\n"
             f"{weather_desc}\n"
@@ -129,3 +120,12 @@ def format_weather_message(weather_data: dict) -> str:
         )
     
     return message
+
+async def get_weather_message(user_id):
+    location = userbase.get_user_location(user_id)
+    
+    if location:
+        weather_data = await get_weather(location['latitude'], location['longitude'])
+        return format_weather_message(weather_data)
+    
+    return None

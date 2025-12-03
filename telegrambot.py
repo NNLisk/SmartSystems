@@ -1,10 +1,10 @@
 from dotenv import load_dotenv, dotenv_values
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import weather
+import weather, lunch
 import userbase
 
-BOT_TOKEN = "token"
+BOT_TOKEN = "8395339833:AAHQQ42FFOg62jHZz1BCq7Gwght8Q8Or7Ms"
 
 waiting_for_city = set()  
 
@@ -54,34 +54,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         coords = await weather.get_coordinates(text)
         
         if coords:
-            weather.user_locations[user_id] = {
-                'latitude': coords['latitude'],
-                'longitude': coords['longitude']
-            }
             userbase.save_user_location(user_id, coords["latitude"], coords["longitude"])
 
             # Immediately fetch and show weather
-            weather_data = await weather.get_weather(coords['latitude'], coords['longitude'])
-            weather_message = weather.format_weather_message(weather_data)
+            weather_message = await weather.get_weather_message(user_id)
             await update.message.reply_text(weather_message)
         else:
             await update.message.reply_text("Could not find that city. Please try again or use /start")
         return
 
-    # User mentions "weather"
     if 'weather' in text_lower:
-        if user_id in weather.user_locations:
-            # User has location saved - show weather directly
-            loc = weather.user_locations[user_id]
-            weather_data = await weather.get_weather(loc['latitude'], loc['longitude'])
-            weather_message = weather.format_weather_message(weather_data)
+        weather_message = await weather.get_weather_message(user_id)
+        
+        if weather_message:
             await update.message.reply_text(weather_message)
         else:
-            # First time - show location button
             await weather.show_location_button(update)
     
     if 'news' in text_lower:
         await update.message.reply_text("lorem ipsum some news to be developed")
+
+    if 'lunch' in text_lower:
+        lunch_message = await lunch.get_lunch_menu()
+        await update.message.reply_text(lunch_message)
 
     if "morning" in text_lower:
         m = await build_morning_message(user_id)
@@ -91,10 +86,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def build_morning_message(user_id):
     m = "GOOOOOOOOD MOOOORNINNGG VIETNAAMMM\n\n"
 
-    userLocation = userbase.get_user_location(user_id)
-    if userLocation != None:
-        weather_data = await weather.get_weather(userLocation["latitude"], userLocation["longitude"])
-        weather_message = weather.format_weather_message(weather_data)
+    weather_message = await weather.get_weather_message(user_id)
+    if weather_message:
         m += weather_message
     else:
         m += "No location given"
