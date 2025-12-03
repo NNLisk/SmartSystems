@@ -47,6 +47,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 'latitude': coords['latitude'],
                 'longitude': coords['longitude']
             }
+            userbase.save_user_location(user_id, coords["latitude"], coords["longitude"])
+
             # Immediately fetch and show weather
             weather_data = await weather.get_weather(coords['latitude'], coords['longitude'])
             weather_message = weather.format_weather_message(weather_data)
@@ -70,9 +72,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif 'news' in text_lower:
         await update.message.reply_text("lorem ipsum some news to be developed")
 
+    if "morning" in text_lower:
+        m = await build_morning_message(user_id)
+        await update.message.reply_text(m) 
 
-def build_morning_message(user_id):
-    pass
+
+async def build_morning_message(user_id):
+    m = "GOOOOOOOOD MOOOORNINNGG VIETNAAMMM\n\n"
+
+    userLocation = userbase.get_user_location(user_id)
+    if userLocation != None:
+        weather_data = await weather.get_weather(userLocation["latitude"], userLocation["longitude"])
+        weather_message = weather.format_weather_message(weather_data)
+        m += weather_message
+    else:
+        m += "No location given"
+
+    return m
+
+    
+    
+
+
 
 
 def main():

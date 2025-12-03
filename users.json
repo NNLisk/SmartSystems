@@ -1,5 +1,9 @@
 {
   "6183807289": {
-    "username": "nLisko"
+    "username": "nLisko",
+    "location": {
+      "latitude": "",
+      "longitude": ""
+    }
   }
 }
