@@ -91,7 +91,7 @@ async def build_morning_message(user_id):
         m += weather_message
     else:
         m += "No location given"
-
+        
     return m
 
     
