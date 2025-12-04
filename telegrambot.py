@@ -25,12 +25,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await weather.show_location_button(update)
 
-    location = update.message.location
-    lat = location.latitude
-    long = location.longitude
-
-    userbase.save_user_location(user_id, lat, long)
-
 
 
 # BASIC MESSAGE LISTENING AND RESPONSES
@@ -91,7 +85,7 @@ async def build_morning_message(user_id):
         m += weather_message
     else:
         m += "No location given"
-        
+
     return m
 
     
