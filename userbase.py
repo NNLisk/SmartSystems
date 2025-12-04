@@ -23,6 +23,9 @@ def add_user(user_id, userName=None):
         "location": {
             "latitude": "",
             "longitude": ""
+        },
+        "news-counts": {
+
         }
     }
     save_users(users)
@@ -44,3 +47,18 @@ def get_user_location(user_id):
     users = load_users()
     return users[str(user_id)]["location"]
 
+def add_news_count(user_id, category):
+    users = load_users()
+    count = user.setdefault("news-counts", {})
+
+    counts[category] = counts.get(category, 0) + 1
+
+    save_users()
+
+def get_preferred_categories(user_id):
+    users = load_users()
+    user = users.get(str(user_id), {})
+    items = user.get("news-counts", {})
+    sorted_items = sorted(items.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
+    categories = [item[0] for item in sorted_items]
+    return categories[:3]

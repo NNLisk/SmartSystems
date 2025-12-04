@@ -1,7 +1,9 @@
 from dotenv import load_dotenv, dotenv_values
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import weather, lunch
+
+import weather, lunch, news, jokes_quotes
+
 import userbase
 
 BOT_TOKEN = "token"
@@ -78,13 +80,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def build_morning_message(user_id):
-    m = "GOOOOOOOOD MOOOORNINNGG VIETNAAMMM\n\n"
+    m = "GOOOOOOOOD MOOOORNINNGG VIETNAAMMM"
+
+    m += "\n\n=== Weather ===\n\n"
 
     weather_message = await weather.get_weather_message(user_id)
     if weather_message:
         m += weather_message
     else:
         m += "No location given"
+
+    m += "\n\n=== News ===\n\n"
+
+    
+    m += news.news_for_user(user_id)
+
+    m += "=== Enterntainment ===\n\n"
+
+    quote = await jokes_quotes.get_quote()
+    m += f"{jokes_quotes.format_quote(quote)}\n\n"
+
+    joke = await jokes_quotes.get_joke()
+    m += f"{jokes_quotes.format_joke(joke)}"
+
 
     return m
 
