@@ -60,7 +60,7 @@ def get_todays_events(user_id):
 
 def format_message(events):
     if not events:
-        return "no lectures today"
+        return "No lectures today\n"
 
     msg = ""
 

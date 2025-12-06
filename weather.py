@@ -30,9 +30,11 @@ async def handle_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     userbase.save_user_location(user_id, location.latitude, location.longitude)
     
-    weather_data = await get_weather(location.latitude, location.longitude)
-    weather_message = format_weather_message(weather_data)
-    await update.message.reply_text(weather_message, reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text(
+        "Awesome! Location saved.\n\n"
+        "Next, let's get your Sisu calendar synced. Please use command /ucal to link it.",
+        reply_markup=ReplyKeyboardRemove()
+    )
 
 # GET COORDINATES FROM CITY NAME
 async def get_coordinates(city_name: str) -> dict:
@@ -101,20 +103,20 @@ def format_weather_message(weather_data: dict) -> str:
     }
     
     weather_code = current.get('weather_code', 0)
-    weather_desc = weather_codes.get(weather_code, "🌍 Unknown")
+    weather_desc = weather_codes.get(weather_code, "☁️ Overcast")
     
     if daily and 'temperature_2m_min' in daily and 'temperature_2m_max' in daily:
         min_temp = daily['temperature_2m_min'][0]
         max_temp = daily['temperature_2m_max'][0]
         precipitation = daily['precipitation_sum'][0] if 'precipitation_sum' in daily else 0
         message = (
-            f"WEATHER TODAY\n"
+            
             f"{weather_desc}\n"
             f"🌡️ Min: {min_temp}°C | Max: {max_temp}°C 💧 {precipitation} mm"
         )
     else:
         message = (
-            f"WEATHER TODAY\n"
+            
             f"{weather_desc}\n"
             f"🌡️ {current.get('temperature_2m', 'N/A')}°C 💧 {current.get('precipitation', 0)} mm"
         )
