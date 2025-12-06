@@ -26,7 +26,8 @@ def add_user(user_id, userName=None):
         },
         "news-counts": {
 
-        }
+        },
+        "calendar-url": ""
     }
     save_users(users)
 
@@ -53,7 +54,7 @@ def add_news_count(user_id, category):
 
     counts[category] = counts.get(category, 0) + 1
 
-    save_users()
+    save_users(users)
 
 def get_preferred_categories(user_id):
     users = load_users()
@@ -62,3 +63,12 @@ def get_preferred_categories(user_id):
     sorted_items = sorted(items.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
     categories = [item[0] for item in sorted_items]
     return categories[:3]
+
+def update_calendar_url(user_id, url):
+    users = load_users()
+    users[str(user_id)]["calendar-url"] = url
+    save_users(users)
+
+def get_calendar_url(user_id):
+    users = load_users()
+    return users[str(user_id)]["calendar-url"]

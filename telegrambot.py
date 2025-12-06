@@ -2,9 +2,9 @@ from dotenv import load_dotenv, dotenv_values
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
-import weather, lunch, news, jokes_quotes
-
+import weather, lunch, news, jokes_quotes, sisu_calendar
 import userbase
+
 
 BOT_TOKEN = "token"
 
@@ -23,6 +23,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "I can help you with weather forecasts! Just mention 'weather' in your message."
 
         "please, accept the use of your location"
+
+        "To use your sisu calendar, please use command /ucal"
     )
 
     await weather.show_location_button(update)
@@ -42,6 +44,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Please type your city name:",
             reply_markup=ReplyKeyboardRemove()
         )
+        return
+
+    if context.user_data.get("waiting_for_calendar_url"):
+        # Save the URL in userbase
+        userbase.update_calendar_url(user_id, text)
+        context.user_data["waiting_for_calendar_url"] = False
+        await update.message.reply_text("Got it! Your calendar has been saved.")
         return
     
     # User is typing city name after clicking the button
@@ -78,11 +87,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         m = await build_morning_message(user_id)
         await update.message.reply_text(m) 
 
+    if "ucal" in text_lower:
+        await update.message.reply_text("Please answer this message with the url from sisu. you can find the url by: log into sisu > go to 'study calendar' > 'export into external calendar'")
+        context.user_data["waiting_for_calendar_url"] = True
 
 async def build_morning_message(user_id):
     m = "GOOOOOOOOD MOOOORNINNGG VIETNAAMMM"
 
     m += "\n\n=== Weather ===\n\n"
+
 
     weather_message = await weather.get_weather_message(user_id)
     if weather_message:
@@ -90,24 +103,24 @@ async def build_morning_message(user_id):
     else:
         m += "No location given"
 
-    m += "\n\n=== News ===\n\n"
+    m += "\n\n=== Today's lectures ===\n\n"
 
+    events = sisu_calendar.get_todays_events(user_id)
+    m += events
+    m += "=== News ===\n\n"
     
     m += news.news_for_user(user_id)
-
     m += "=== Enterntainment ===\n\n"
-
+    m += "A Quote:\n\n"
     quote = await jokes_quotes.get_quote()
     m += f"{jokes_quotes.format_quote(quote)}\n\n"
-
+    m += "A Joke:\n\n"
     joke = await jokes_quotes.get_joke()
     m += f"{jokes_quotes.format_joke(joke)}"
 
 
     return m
 
-    
-    
 
 
 

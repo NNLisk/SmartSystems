@@ -48,7 +48,7 @@ def news_for_user(user_id):
     preferred_categories = userbase.get_preferred_categories(user_id)
     print(preferred_categories)
     if not preferred_categories:
-        return random.sample(news, 4)
+        usernews = random.sample(news, 4)
     
     # for item in news:
     #     print(item.get("category"))
@@ -68,8 +68,8 @@ def news_for_user(user_id):
 
     for new in usernews:
         nm = ""
-        nm += f"{new.get("title")}\n"
-        nm += f"{new.get("url")}\n\n"
+        nm += f"{new.get('title')}\n"
+        nm += f"{new.get('url')}\n\n"
         newsmessage += nm
 
     return newsmessage
