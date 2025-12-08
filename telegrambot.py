@@ -4,6 +4,9 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 import weather, lunch, news, jokes_quotes, sisu_calendar
 import userbase
 from AI_advisor import get_funny_day_rating
+import time
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 
 
 BOT_TOKEN = "token"
@@ -172,6 +175,25 @@ async def morning_buttons_handler(update, context):
         userbase.save_attendance(query.from_user.id, False)
         await query.message.reply_text("💤 Logged as *stayed home*. A brave choice indeed.")
 
+
+async def send_to_all(app):
+    user_ids = userbase.get_user_ids()
+
+    for uid in user_ids:
+        m = build_morning_message(uid)
+        try:
+            await app.bot.send_message(
+                chat_id = int(uid),
+                text = m
+            )
+        except Exception as e:
+            print(f"Failed to send to {uid}")
+            
+
+def setup_scheduler(app):
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(send_to_all, "cron", hour=13, minutes=30, args=[application])
+    scheduler.start()
 
 
 def main():

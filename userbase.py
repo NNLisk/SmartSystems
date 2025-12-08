@@ -12,10 +12,18 @@ def load_users():
     except(json.JSONDecodeError, FileNotFoundError):
         return {}
 
+
 def save_users(users):
     with open(DB_USERS, "w") as f:
         json.dump(users, f, indent=2)
 
+def get_user_ids():
+    try:
+        with open(DB_USERS, "r") as f:
+            data = json.load(f)
+        return list(data.keys())
+    except:
+        return []
 
 def add_user(user_id, userName=None):
     users = load_users()
@@ -75,7 +83,7 @@ def get_attendance_summary(user_id):
 
 def add_news_count(user_id, category):
     users = load_users()
-    count = user.setdefault("news-counts", {})
+    counts = user.setdefault("news-counts", {})
 
     counts[category] = counts.get(category, 0) + 1
 

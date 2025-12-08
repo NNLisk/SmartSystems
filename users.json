@@ -2,11 +2,12 @@
   "6183807289": {
     "username": "nLisko",
     "location": {
-      "latitude": 60.978017,
-      "longitude": 25.591744
+      "latitude": 60.98267,
+      "longitude": 25.66151
     },
     "news-counts": {},
-    "calendar-url": "https://sisu.lut.fi:443/ilmo/api/calendar-share/be56c206-e533-49a7-9645-b3eadd32e49f"
+    "calendar-url": "https://sisu.lut.fi:443/ilmo/api/calendar-share/be56c206-e533-49a7-9645-b3eadd32e49f",
+    "attendance": {}
   },
   "7253928429": {
     "username": "EmilijaKur",
