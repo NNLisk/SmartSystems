@@ -1,7 +1,7 @@
 from dotenv import load_dotenv, dotenv_values
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
-import weather, lunch, news, jokes_quotes, sisu_calendar
+import weather, lunch, news, jokes_quotes, sisu_calendar, reminders
 import userbase
 from AI_advisor import get_funny_day_rating
 import time
