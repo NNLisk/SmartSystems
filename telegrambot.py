@@ -5,8 +5,9 @@ import weather, lunch, news, jokes_quotes, sisu_calendar
 import userbase
 from AI_advisor import get_funny_day_rating
 import time
+import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+import pytz
 
 
 BOT_TOKEN = "token"
@@ -155,7 +156,16 @@ async def send_morning(update, context, user_id):
 
     await update.message.reply_text(text, reply_markup=reply_markup)
 
+async def send_morning_to_user(bot, user_id):
+    """Send morning message to a single user"""
+    text = await build_morning_message(user_id)
+    keyboard = [
+        [InlineKeyboardButton("💭 Quote", callback_data="get_quote"),
+         InlineKeyboardButton("😂 Joke", callback_data="get_joke")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
+    await bot.send_message(chat_id=int(user_id), text=text, reply_markup=reply_markup)
 
 async def morning_buttons_handler(update, context):
     query = update.callback_query
@@ -176,25 +186,21 @@ async def morning_buttons_handler(update, context):
         await query.message.reply_text("💤 Logged as *stayed home*. A brave choice indeed.")
 
 
-async def send_to_all(app):
+
+async def send_to_all(context: ContextTypes.DEFAULT_TYPE):
+    print("triggered")
     user_ids = userbase.get_user_ids()
 
     for uid in user_ids:
-        m = build_morning_message(uid)
         try:
-            await app.bot.send_message(
-                chat_id = int(uid),
-                text = m
-            )
+            print(f"sending to {uid}")
+            await send_morning_to_user(context.bot, uid)
         except Exception as e:
-            print(f"Failed to send to {uid}")
+            print(f"Failed to send to {uid}: {e}")
             
 
-def setup_scheduler(app):
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(send_to_all, "cron", hour=13, minutes=30, args=[application])
-    scheduler.start()
-
+def testjob(context: ContextTypes.DEFAULT_TYPE):
+    print("TEST JOB FIRED")
 
 def main():
     config = dotenv_values(".env")
@@ -206,7 +212,15 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
     app.add_handler(CallbackQueryHandler(morning_buttons_handler))
 
-
+    # run_time = datetime.now(pytz.UTC) + timedelta(seconds=10)
+    t = datetime.time(hour=17, minute=56, tzinfo=pytz.timezone("Europe/Helsinki"))
+    print(t)
+    app.job_queue.run_daily(send_to_all, time=t, days=(0,1,2,3,4,5,6))
+    # app.job_queue.run_once(send_to_all, when=run_time)
+    # app.job_queue.run_once(
+    #     callback=testjob,
+    #     when=datetime.now(pytz.UTC) + timedelta(seconds=5)
+    # )
     print("Bot is running...")
     app.run_polling()
 

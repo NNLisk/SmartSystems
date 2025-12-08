@@ -10,7 +10,7 @@ def getCalendar(inputurl):
     ics = response.text
     print("calendar got")
     cal = parse_calendar(ics)
-    print(cal)
+    
     return cal
 
 def parse_calendar(calendar):
